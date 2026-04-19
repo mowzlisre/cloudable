@@ -11,11 +11,11 @@
     "dev": "concurrently -n FRONTEND,ELECTRON -c cyan,yellow \"npm run dev:frontend\" \"wait-on http://localhost:5173 && electron .\"",
     "dev:frontend": "cd frontend && npm run dev",
     "build:frontend": "cd frontend && npm run build",
-    "build": "npm run build:frontend && electron-builder",
-    "dist:mac": "npm run build:frontend && electron-builder --mac --arm64",
-    "dist:mac:x64": "npm run build:frontend && electron-builder --mac --x64",
-    "dist:win": "npm run build:frontend && electron-builder --win",
-    "dist:linux": "npm run build:frontend && electron-builder --linux"
+    "make": "electron-forge make",
+    "make:mac": "electron-forge make --platform darwin",
+    "make:win": "electron-forge make --platform win32",
+    "make:linux": "electron-forge make --platform linux",
+    "package": "electron-forge package"
   },
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.1032.0",
@@ -38,67 +38,15 @@
     "express": "^4.19.2"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/maker-deb": "^7.11.1",
+    "@electron-forge/maker-squirrel": "^7.11.1",
+    "@electron-forge/maker-zip": "^7.11.1",
     "concurrently": "^8.2.2",
     "electron": "^31.0.0",
-    "electron-builder": "^24.13.3",
     "wait-on": "^7.2.0"
   },
-  "build": {
-    "appId": "com.cloudable.desktop",
-    "productName": "Cloudable",
-    "copyright": "Cloudable",
-    "asar": true,
-    "directories": {
-      "output": "dist-electron",
-      "buildResources": "electron/assets"
-    },
-    "files": [
-      "electron/**/*",
-      "backend/**/*",
-      "frontend/dist/**/*",
-      "!backend/.env*",
-      "!backend/deploy.sh",
-      "!backend/node_modules/**",
-      "!**/node_modules/.cache/**"
-    ],
-    "mac": {
-      "category": "public.app-category.finance",
-      "icon": "electron/assets/icon.png",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "electron/assets/entitlements.mac.plist",
-      "entitlementsInherit": "electron/assets/entitlements.mac.plist",
-      "target": [
-        {
-          "target": "dmg",
-          "arch": ["x64"]
-        }
-      ]
-    },
-    "mas": {
-      "entitlements": "electron/assets/entitlements.mac.plist",
-      "entitlementsInherit": "electron/assets/entitlements.mac.plist"
-    },
-    "win": {
-      "icon": "electron/assets/icon.png",
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
-    },
-    "linux": {
-      "icon": "electron/assets/icon.png",
-      "target": "AppImage",
-      "category": "Finance"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "license": "LICENSE.txt"
-    }
+  "config": {
+    "forge": "./forge.config.js"
   }
 }

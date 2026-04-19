@@ -1,0 +1,92 @@
+{
+  "name": "cloudable",
+  "version": "1.0.0",
+  "description": "AWS cost intelligence desktop app",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -n FRONTEND,ELECTRON -c cyan,yellow \"npm run dev:frontend\" \"wait-on http://localhost:5173 && electron .\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:frontend && electron-builder",
+    "dist:mac": "npm run build:frontend && electron-builder --mac",
+    "dist:win": "npm run build:frontend && electron-builder --win",
+    "dist:linux": "npm run build:frontend && electron-builder --linux"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudfront": "^3.1032.0",
+    "@aws-sdk/client-cloudwatch": "^3.1032.0",
+    "@aws-sdk/client-cloudwatch-logs": "^3.1032.0",
+    "@aws-sdk/client-cost-explorer": "^3.600.0",
+    "@aws-sdk/client-ec2": "^3.600.0",
+    "@aws-sdk/client-ecs": "^3.1032.0",
+    "@aws-sdk/client-elastic-load-balancing-v2": "^3.600.0",
+    "@aws-sdk/client-iam": "^3.1032.0",
+    "@aws-sdk/client-lambda": "^3.1032.0",
+    "@aws-sdk/client-organizations": "^3.1032.0",
+    "@aws-sdk/client-rds": "^3.600.0",
+    "@aws-sdk/client-route-53": "^3.1032.0",
+    "@aws-sdk/client-s3": "^3.1032.0",
+    "@aws-sdk/client-sts": "^3.600.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "electron-store": "^8.1.0",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.cloudable.desktop",
+    "productName": "Cloudable",
+    "copyright": "Cloudable",
+    "asar": true,
+    "directories": {
+      "output": "dist-electron",
+      "buildResources": "electron/assets"
+    },
+    "files": [
+      "electron/**/*",
+      "backend/**/*",
+      "frontend/dist/**/*",
+      "!backend/.env*",
+      "!backend/deploy.sh",
+      "!backend/node_modules/**",
+      "!**/node_modules/.cache/**"
+    ],
+    "mac": {
+      "category": "public.app-category.finance",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Finance"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "electron/assets/icon.ico",
+      "uninstallerIcon": "electron/assets/icon.ico"
+    }
+  }
+}

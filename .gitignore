@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Build output
+frontend/dist/
+dist-electron/
+dist/
+out/
+
+# Credentials & secrets
+.claude
+.env
+.env.*
+!.env.example
+backend/.env
+electron/.env
+
+# electron-store data
+*.json
+!package.json
+!package-lock.json
+!tsconfig*.json
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

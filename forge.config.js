@@ -4,7 +4,7 @@ const { execSync } = require('child_process');
 module.exports = {
   packagerConfig: {
     name: 'Cloudable',
-    executableName: 'Cloudable',
+    executableName: 'cloudable',
     appBundleId: 'com.cloudable.desktop',
     appCategoryType: 'public.app-category.finance',
     icon: path.resolve(__dirname, 'electron/assets/icon'),

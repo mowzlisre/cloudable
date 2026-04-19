@@ -33,7 +33,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Cloudable-mac-arm64
-          path: out/make/zip/darwin/arm64/*.zip
+          path: out/make/zip/darwin/**/*.zip
           if-no-files-found: error
           retention-days: 30
 
@@ -57,7 +57,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Cloudable-mac-x64
-          path: out/make/zip/darwin/x64/*.zip
+          path: out/make/zip/darwin/**/*.zip
           if-no-files-found: error
           retention-days: 30
 
@@ -79,7 +79,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Cloudable-win
-          path: out/make/squirrel.windows/x64/*.exe
+          path: out/make/squirrel.windows/**/*.exe
           if-no-files-found: error
           retention-days: 30
 
@@ -102,7 +102,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Cloudable-linux
-          path: out/make/deb/x64/*.deb
+          path: out/make/deb/**/*.deb
           if-no-files-found: error
           retention-days: 30
 

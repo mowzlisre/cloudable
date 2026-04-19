@@ -13,110 +13,138 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-            platform: mac
-            artifact_glob: dist-electron/*.dmg
-          - os: windows-latest
-            platform: win
-            artifact_glob: dist-electron/*.exe
-          - os: ubuntu-latest
-            platform: linux
-            artifact_glob: dist-electron/*.AppImage
-
-    runs-on: ${{ matrix.os }}
-    name: Build (${{ matrix.platform }})
-
+  # ── macOS arm64 (Apple Silicon) ──────────────────────────────────────────────
+  build-mac-arm64:
+    name: Build (mac-arm64)
+    runs-on: macos-latest      # M-series runner — native arm64
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      # Install root dependencies (electron, electron-builder, AWS SDK, etc.)
-      - name: Install root dependencies
-        run: npm ci
-
-      # Install and build the Vite frontend
-      - name: Install frontend dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
         working-directory: frontend
 
-      - name: Build frontend
-        run: npm run build
-        working-directory: frontend
-
-      # Package with electron-builder (platform-specific)
-      - name: Package — macOS
-        if: matrix.platform == 'mac'
-        run: npx electron-builder --mac --publish never
+      - name: Package
+        run: npx electron-builder --mac --arm64 --publish never
         env:
-          # Set to your Apple credentials in repo secrets to enable signing.
-          # Leave unset for unsigned builds (CI/testing).
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Package — Windows
-        if: matrix.platform == 'win'
-        run: npx electron-builder --win --publish never
-
-      - name: Package — Linux
-        if: matrix.platform == 'linux'
-        run: npx electron-builder --linux --publish never
-
-      # Upload the packaged artifact
-      - name: Upload artifact — macOS dmg
-        if: matrix.platform == 'mac'
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: Cloudable-mac
-          path: dist-electron/*.dmg
+          name: Cloudable-mac-arm64
+          path: dist-electron/*arm64*.dmg
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload artifact — Windows installer
-        if: matrix.platform == 'win'
-        uses: actions/upload-artifact@v4
+  # ── macOS x64 (Intel) ────────────────────────────────────────────────────────
+  build-mac-x64:
+    name: Build (mac-x64)
+    runs-on: macos-13           # Last Intel runner — native x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+
+      - name: Package
+        run: npx electron-builder --mac --x64 --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cloudable-mac-x64
+          path: dist-electron/*x64*.dmg
+          if-no-files-found: error
+          retention-days: 30
+
+  # ── Windows x64 ──────────────────────────────────────────────────────────────
+  build-win:
+    name: Build (win-x64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+
+      - name: Package
+        run: npx electron-builder --win --publish never
+
+      - uses: actions/upload-artifact@v4
         with:
           name: Cloudable-win
           path: dist-electron/*.exe
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload artifact — Linux AppImage
-        if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v4
+  # ── Linux AppImage ────────────────────────────────────────────────────────────
+  build-linux:
+    name: Build (linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+
+      - name: Package
+        run: npx electron-builder --linux --publish never
+
+      - uses: actions/upload-artifact@v4
         with:
           name: Cloudable-linux
           path: dist-electron/*.AppImage
           if-no-files-found: error
           retention-days: 30
 
-  # Collect all artifacts into a single summary when building from a tag
+  # ── GitHub Release (tags only) ────────────────────────────────────────────────
   release:
     name: Create Release
-    needs: build
+    needs: [build-mac-arm64, build-mac-x64, build-win, build-linux]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
 
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           path: release-assets
           merge-multiple: false
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           files: release-assets/**/*
           generate_release_notes: true

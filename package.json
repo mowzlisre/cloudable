@@ -12,7 +12,8 @@
     "dev:frontend": "cd frontend && npm run dev",
     "build:frontend": "cd frontend && npm run build",
     "build": "npm run build:frontend && electron-builder",
-    "dist:mac": "npm run build:frontend && electron-builder --mac",
+    "dist:mac": "npm run build:frontend && electron-builder --mac --arm64",
+    "dist:mac:x64": "npm run build:frontend && electron-builder --mac --x64",
     "dist:win": "npm run build:frontend && electron-builder --win",
     "dist:linux": "npm run build:frontend && electron-builder --linux"
   },
@@ -63,15 +64,20 @@
     "mac": {
       "category": "public.app-category.finance",
       "icon": "electron/assets/icon.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "electron/assets/entitlements.mac.plist",
+      "entitlementsInherit": "electron/assets/entitlements.mac.plist",
       "target": [
         {
           "target": "dmg",
-          "arch": [
-            "arm64",
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ]
+    },
+    "mas": {
+      "entitlements": "electron/assets/entitlements.mac.plist",
+      "entitlementsInherit": "electron/assets/entitlements.mac.plist"
     },
     "win": {
       "icon": "electron/assets/icon.png",

@@ -2,6 +2,10 @@
   "name": "cloudable",
   "version": "1.0.0",
   "description": "AWS cost intelligence desktop app",
+  "author": {
+    "name": "Cloudable",
+    "email": "contact@mowzlisre.me"
+  },
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently -n FRONTEND,ELECTRON -c cyan,yellow \"npm run dev:frontend\" \"wait-on http://localhost:5173 && electron .\"",
@@ -70,7 +74,7 @@
       ]
     },
     "win": {
-      "icon": "electron/assets/icon.ico",
+      "icon": "electron/assets/icon.png",
       "target": [
         {
           "target": "nsis",
@@ -88,8 +92,6 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "electron/assets/icon.ico",
-      "uninstallerIcon": "electron/assets/icon.ico",
       "license": "LICENSE.txt"
     }
   }

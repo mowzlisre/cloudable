@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRegion } from '../context/RegionContext';
 import { Map, RefreshCw, AlertCircle, Info, ChevronDown, Download } from 'lucide-react';
 import Spinner from '../components/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -67,11 +68,7 @@ function RegionPicker({ value, onChange }) {
 }
 
 export default function Mapper() {
-  const [region, setRegion] = useState(import.meta.env.VITE_AWS_REGION || 'us-east-1');
-
-  useEffect(() => {
-    window.electronAPI?.loadDefaultRegion().then(r => setRegion(r));
-  }, []);
+  const { region, setRegion } = useRegion();
   const qc = useQueryClient();
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({

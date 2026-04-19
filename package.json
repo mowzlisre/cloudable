@@ -58,6 +58,7 @@
     ],
     "mac": {
       "category": "public.app-category.finance",
+      "icon": "electron/assets/icon.png",
       "target": [
         {
           "target": "dmg",
@@ -69,6 +70,7 @@
       ]
     },
     "win": {
+      "icon": "electron/assets/icon.ico",
       "target": [
         {
           "target": "nsis",
@@ -79,6 +81,7 @@
       ]
     },
     "linux": {
+      "icon": "electron/assets/icon.png",
       "target": "AppImage",
       "category": "Finance"
     },
@@ -86,7 +89,8 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "installerIcon": "electron/assets/icon.ico",
-      "uninstallerIcon": "electron/assets/icon.ico"
+      "uninstallerIcon": "electron/assets/icon.ico",
+      "license": "LICENSE.txt"
     }
   }
 }

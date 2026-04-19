@@ -1,0 +1,55 @@
+CLOUDABLE END USER LICENSE AGREEMENT
+
+Effective Date: April 18, 2025
+
+PLEASE READ THIS END USER LICENSE AGREEMENT ("AGREEMENT") CAREFULLY BEFORE INSTALLING OR
+USING CLOUDABLE ("SOFTWARE"). BY INSTALLING OR USING THE SOFTWARE, YOU AGREE TO BE BOUND
+BY THE TERMS OF THIS AGREEMENT.
+
+1. LICENSE GRANT
+   Subject to the terms of this Agreement, you are granted a personal, non-exclusive,
+   non-transferable, revocable license to install and use the Software on devices you own
+   or control, solely for your internal business or personal purposes.
+
+2. RESTRICTIONS
+   You may not: (a) copy, modify, or distribute the Software; (b) reverse engineer,
+   decompile, or disassemble the Software; (c) rent, lease, or lend the Software;
+   (d) use the Software to access AWS accounts you are not authorized to access;
+   (e) remove any proprietary notices from the Software.
+
+3. AWS CREDENTIALS AND SECURITY
+   You are solely responsible for the security of AWS credentials configured in the
+   Software. Use credentials with the minimum required permissions. The developer is not
+   liable for unauthorized AWS charges resulting from compromised credentials on your machine.
+
+4. PRIVACY
+   The Software does not collect, transmit, or store any data on external servers. All
+   AWS credentials are encrypted using your operating system's native secure storage.
+   All AWS API calls are made directly from your machine to AWS. No telemetry or usage
+   data is collected.
+
+5. DISCLAIMER OF WARRANTIES
+   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+6. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE DEVELOPER BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+   CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE SOFTWARE, EVEN IF
+   ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. COST DATA DISPLAYED IS SOURCED FROM THE
+   AWS COST EXPLORER API AND MAY NOT EXACTLY MATCH YOUR AWS BILLING STATEMENTS.
+
+7. AWS DISCLAIMER
+   Cloudable is not affiliated with, endorsed by, or sponsored by Amazon Web Services, Inc.
+   "AWS" and "Amazon Web Services" are trademarks of Amazon.com, Inc.
+
+8. TERMINATION
+   This license is effective until terminated. It terminates automatically if you fail to
+   comply with any term. Upon termination, you must destroy all copies of the Software.
+
+9. GOVERNING LAW
+   This Agreement is governed by applicable law. Any disputes shall be resolved through
+   good-faith negotiation.
+
+10. CONTACT
+    contact@mowzlisre.me

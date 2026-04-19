@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useRegion } from '../context/RegionContext';
 import { useQuery } from '@tanstack/react-query';
 import { TrendingDown, DollarSign, Server, Database, RefreshCw, AlertTriangle, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { api } from '../api/client';
@@ -266,11 +267,7 @@ function RDSTable({ data }) {
 }
 
 export default function Rightsizing() {
-  const [region, setRegion] = useState(import.meta.env.VITE_AWS_REGION || 'us-east-1');
-
-  useEffect(() => {
-    window.electronAPI?.loadDefaultRegion().then(r => r && setRegion(r));
-  }, []);
+  const { region } = useRegion();
 
   const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['rightsizing', region],

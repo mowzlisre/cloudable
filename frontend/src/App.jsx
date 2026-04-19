@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { RegionProvider } from './context/RegionContext';
 import Layout from './components/Layout';
 import CredentialsGate from './components/CredentialsGate';
 import Dashboard from './pages/Dashboard';
@@ -13,6 +14,7 @@ import Hygiene from './pages/Hygiene';
 import Rightsizing from './pages/Rightsizing';
 import Aggregator from './pages/Aggregator';
 import Organizations from './pages/Organizations';
+import Legal from './pages/Legal';
 import EC2 from './pages/services/EC2';
 import RDS from './pages/services/RDS';
 import S3 from './pages/services/S3';
@@ -33,6 +35,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <RegionProvider>
         <CredentialsGate>
           <Routes>
             <Route path="/" element={<Layout />}>
@@ -53,9 +56,11 @@ export default function App() {
               <Route path="services/others" element={<Others />} />
               <Route path="billing/overview" element={<BillingOverview />} />
               <Route path="settings"      element={<Settings />} />
+              <Route path="legal"         element={<Legal />} />
             </Route>
           </Routes>
         </CredentialsGate>
+        </RegionProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

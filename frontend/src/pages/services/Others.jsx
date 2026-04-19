@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useRegion } from '../../context/RegionContext';
 import { useQuery } from '@tanstack/react-query';
 import { Zap, Globe, Container, RefreshCw, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import { api } from '../../api/client';
@@ -11,11 +12,9 @@ function ErrorRate({ rate }) {
 }
 
 export default function Others() {
-  const [region, setRegion] = useState(import.meta.env.VITE_AWS_REGION || 'us-east-1');
+  const { region } = useRegion();
   const [tab, setTab] = useState('Lambda');
   const [expanded, setExpanded] = useState(null);
-
-  useEffect(() => { window.electronAPI?.loadDefaultRegion().then(r => r && setRegion(r)); }, []);
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['others', region],

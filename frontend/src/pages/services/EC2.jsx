@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useRegion } from '../../context/RegionContext';
 import { useQuery } from '@tanstack/react-query';
 import { Server, RefreshCw, HardDrive, Cpu, Wifi, ChevronDown, ChevronUp, Globe } from 'lucide-react';
 import { api } from '../../api/client';
@@ -20,10 +21,8 @@ function UtilBar({ value, max = 100 }) {
 }
 
 export default function EC2() {
-  const [region, setRegion] = useState(import.meta.env.VITE_AWS_REGION || 'us-east-1');
+  const { region } = useRegion();
   const [expanded, setExpanded] = useState(null);
-
-  useEffect(() => { window.electronAPI?.loadDefaultRegion().then(r => r && setRegion(r)); }, []);
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['ec2', region],

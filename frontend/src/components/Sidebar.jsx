@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useRegion } from '../context/RegionContext';
 import {
   LayoutDashboard, Building2, Server, Database, HardDrive, Box,
   DollarSign, FileText, Map, HeartPulse, TrendingDown, Globe,
   Settings, CloudLightning, ChevronDown, ExternalLink, HelpCircle,
-  Layers, ChevronUp,
+  Layers, ChevronUp, Scale,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
@@ -35,7 +36,7 @@ const NAV = [
   { to: '/aggregator',  icon: Globe,        label: 'Multi-Account' },
 ];
 
-function NavItem({ item, depth = 0 }) {
+function NavItem({ item }) {
   const location = useLocation();
   const isChildActive = item.children?.some(c => location.pathname.startsWith(c.to));
   const [open, setOpen] = useState(isChildActive);
@@ -116,17 +117,12 @@ const REGION_LIST = [
 ];
 
 function RegionSwitcher() {
-  const [region, setRegion] = useState('us-east-1');
+  const { region, setRegion } = useRegion();
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    window.electronAPI?.loadDefaultRegion().then(r => r && setRegion(r));
-  }, []);
-
   async function handleSelect(r) {
-    setRegion(r);
+    await setRegion(r);
     setOpen(false);
-    await window.electronAPI?.saveDefaultRegion(r);
   }
 
   return (
@@ -220,6 +216,23 @@ export default function Sidebar() {
               <>
                 <Settings size={15} className={isActive ? 'text-red-400' : ''} />
                 Settings
+              </>
+            )}
+          </NavLink>
+          <NavLink
+            to="/legal"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150 ${
+                isActive
+                  ? 'bg-red-950/40 text-red-400 border-l-2 border-red-500 pl-[10px] font-medium'
+                  : 'text-gray-500 hover:text-gray-200 hover:bg-[#161616]'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Scale size={15} className={isActive ? 'text-red-400' : ''} />
+                Legal
               </>
             )}
           </NavLink>

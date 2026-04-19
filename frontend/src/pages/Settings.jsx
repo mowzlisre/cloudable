@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRegion } from '../context/RegionContext';
 import { Eye, EyeOff, Key, Save, Trash2, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Globe, Plus, Users, ChevronDown, Copy, Lock } from 'lucide-react';
 import { api } from '../api/client';
 
@@ -94,7 +95,7 @@ export default function Settings() {
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
   const [existing, setExisting] = useState(null);
-  const [defaultRegion, setDefaultRegion] = useState('us-east-1');
+  const { region: defaultRegion, setRegion: setDefaultRegionCtx } = useRegion();
   const [regionSaved, setRegionSaved] = useState(false);
   const [profiles, setProfiles] = useState([]);
   const [profileForm, setProfileForm] = useState({ name: '', accessKeyId: '', secretKey: '', region: 'us-east-1' });
@@ -109,14 +110,12 @@ export default function Settings() {
         setExisting(creds);
         setForm(f => ({ ...f, region: creds.region || 'us-east-1' }));
       });
-      window.electronAPI.loadDefaultRegion().then(r => setDefaultRegion(r));
       window.electronAPI.loadProfiles().then(setProfiles);
     }
   }, []);
 
-  async function handleSaveDefaultRegion(region) {
-    await window.electronAPI.saveDefaultRegion(region);
-    setDefaultRegion(region);
+  async function handleSaveDefaultRegion(r) {
+    await setDefaultRegionCtx(r);
     setRegionSaved(true);
     setTimeout(() => setRegionSaved(false), 3000);
   }

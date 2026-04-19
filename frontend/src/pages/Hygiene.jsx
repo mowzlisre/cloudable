@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useRegion } from '../context/RegionContext';
 import { useQuery } from '@tanstack/react-query';
 import { HeartPulse, RefreshCw, ChevronDown, MapPin } from 'lucide-react';
 import Spinner from '../components/Spinner';
@@ -80,11 +81,7 @@ function AzBreakdown({ azBreakdown, region }) {
 }
 
 export default function Hygiene() {
-  const [region, setRegion] = useState('us-east-1');
-
-  useEffect(() => {
-    window.electronAPI?.loadDefaultRegion().then(r => setRegion(r));
-  }, []);
+  const { region, setRegion } = useRegion();
 
   const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['hygiene', region],

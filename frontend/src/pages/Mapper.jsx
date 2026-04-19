@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useRegion } from '../context/RegionContext';
 import { RefreshCw, AlertCircle, Info, ChevronDown, Download, Bug } from 'lucide-react';
 import { toPng, toJpeg, toSvg } from 'html-to-image';
@@ -16,8 +16,6 @@ const REGIONS = [
   { group: 'Asia Pacific',  regions: ['ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'ap-south-1', 'ap-east-1'] },
   { group: 'Other',         regions: ['ca-central-1', 'sa-east-1', 'af-south-1', 'me-south-1', 'me-central-1'] },
 ];
-
-const ALL_REGIONS = REGIONS.flatMap(g => g.regions);
 
 function fetchMapper(region) {
   return fetch(`${BASE}/api/mapper?region=${region}`)
@@ -71,7 +69,6 @@ function RegionPicker({ value, onChange }) {
 
 export default function Mapper() {
   const { region, setRegion } = useRegion();
-  const qc = useQueryClient();
   const canvasRef = useRef(null);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
@@ -79,11 +76,6 @@ export default function Mapper() {
     queryFn: () => fetchMapper(region),
     staleTime: 10 * 60 * 1000,
   });
-
-  function handleRegionChange(r) {
-    setRegion(r);
-    // query auto-refetches because key changes; no manual call needed
-  }
 
   const hasData = data && data.nodes?.length > 0;
   const [exportOpen, setExportOpen] = useState(false);
@@ -103,26 +95,33 @@ export default function Mapper() {
       URL.revokeObjectURL(url);
       return;
     }
-    const el = canvasRef.current;
-    if (!el) return;
+    const handle = canvasRef.current;
+    if (!handle) return;
+    handle.setExporting(true);
+    await new Promise(r => setTimeout(r, 60)); // wait for re-render
+    const el = handle.getElement();
     const opts = { backgroundColor: '#080808', skipFonts: true };
-    if (format === 'png') {
-      dlDataUrl(await toPng(el, opts), `${filename}.png`);
-    } else if (format === 'jpeg') {
-      dlDataUrl(await toJpeg(el, { ...opts, quality: 0.95 }), `${filename}.jpg`);
-    } else if (format === 'svg') {
-      dlDataUrl(await toSvg(el, opts), `${filename}.svg`);
-    } else if (format === 'pdf') {
-      const url = await toPng(el, opts);
-      const img = new Image(); img.src = url;
-      await new Promise(r => { img.onload = r; });
-      const pdf = new jsPDF({
-        orientation: img.width > img.height ? 'l' : 'p',
-        unit: 'px',
-        format: [img.width, img.height],
-      });
-      pdf.addImage(url, 'PNG', 0, 0, img.width, img.height);
-      pdf.save(`${filename}.pdf`);
+    try {
+      if (format === 'png') {
+        dlDataUrl(await toPng(el, opts), `${filename}.png`);
+      } else if (format === 'jpeg') {
+        dlDataUrl(await toJpeg(el, { ...opts, quality: 0.95 }), `${filename}.jpg`);
+      } else if (format === 'svg') {
+        dlDataUrl(await toSvg(el, opts), `${filename}.svg`);
+      } else if (format === 'pdf') {
+        const url = await toPng(el, opts);
+        const img = new Image(); img.src = url;
+        await new Promise(r => { img.onload = r; });
+        const pdf = new jsPDF({
+          orientation: img.width > img.height ? 'l' : 'p',
+          unit: 'px',
+          format: [img.width, img.height],
+        });
+        pdf.addImage(url, 'PNG', 0, 0, img.width, img.height);
+        pdf.save(`${filename}.pdf`);
+      }
+    } finally {
+      handle.setExporting(false);
     }
   }
 
@@ -132,7 +131,11 @@ export default function Mapper() {
       <div className="px-8 py-8 flex items-center justify-between shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
         <div>
           <h1 className="text-xl font-semibold text-white">Resource Mapper</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Visual topology of your AWS infrastructure</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <p className="text-sm text-gray-500">Visual topology of your AWS infrastructure</p>
+            <span className="text-gray-700">·</span>
+            <RegionPicker value={region} onChange={setRegion} />
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

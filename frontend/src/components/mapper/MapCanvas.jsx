@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState, forwardRef } from 'react';
+import { useCallback, useMemo, useState, forwardRef, useRef, useImperativeHandle } from 'react';
 import ReactFlow, {
-  Background, Controls, MiniMap,
+  Background, Controls,
   useNodesState, useEdgesState,
   MarkerType,
 } from 'reactflow';
@@ -169,8 +169,31 @@ const CONTROLS_CSS = `
 .react-flow__controls button svg { fill: #ef4444 !important; }
 `;
 
+// ── Brand widget (replaces MiniMap) ─────────────────────────────────────────
+function BrandWidget() {
+  return (
+    <div style={{
+      position: 'absolute', bottom: 10, right: 10, zIndex: 5,
+      display: 'flex', alignItems: 'center', gap: 8,
+      background: '#111111', border: '1px solid #1e1e1e',
+      borderRadius: 8, padding: '6px 12px',
+    }}>
+      <img src="/icon.png" alt="Cloudable" style={{ width: 18, height: 18, borderRadius: 4 }} />
+      <span style={{ fontSize: 12, fontWeight: 600, color: '#e5e7eb', letterSpacing: '0.01em' }}>Cloudable</span>
+    </div>
+  );
+}
+
 // ── Main canvas ──────────────────────────────────────────────────────────────
 const MapCanvas = forwardRef(function MapCanvas({ data }, ref) {
+  const containerRef = useRef(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    getElement: () => containerRef.current,
+    setExporting: (v) => setIsExporting(v),
+  }));
+
   const initialNodes = useMemo(() => buildTieredLayout(data.nodes), [data]);
   const initialEdges = useMemo(() => buildEdges(data.edges), [data]);
 
@@ -215,16 +238,18 @@ const MapCanvas = forwardRef(function MapCanvas({ data }, ref) {
   }, [edges, nodes, hiddenTypes, issuesOnly]);
 
   return (
-    <div ref={ref} style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
       <style>{CONTROLS_CSS}</style>
-      <FilterBar
-        presentTypes={presentTypes}
-        hiddenTypes={hiddenTypes}
-        setHiddenTypes={setHiddenTypes}
-        issuesOnly={issuesOnly}
-        setIssuesOnly={setIssuesOnly}
-        issueCount={issueCount}
-      />
+      {!isExporting && (
+        <FilterBar
+          presentTypes={presentTypes}
+          hiddenTypes={hiddenTypes}
+          setHiddenTypes={setHiddenTypes}
+          issuesOnly={issuesOnly}
+          setIssuesOnly={setIssuesOnly}
+          issueCount={issueCount}
+        />
+      )}
 
       <ReactFlow
         nodes={filteredNodes}
@@ -242,29 +267,11 @@ const MapCanvas = forwardRef(function MapCanvas({ data }, ref) {
         proOptions={{ hideAttribution: true }}
       >
         <Background color="#1a1a1a" gap={20} size={1} />
-        <MiniMap
-          style={{ background: '#111111', border: '1px solid #1e1e1e' }}
-          nodeColor={n => {
-            const map = {
-              ec2: '#f97316', rds: '#3b82f6', aurora: '#1d4ed8', igw: '#22c55e',
-              internet: '#06b6d4', eip: '#eab308', nat: '#f97316', alb: '#a855f7',
-              lambda: '#f59e0b', ecs: '#10b981', cloudfront: '#8b5cf6',
-              elasticache: '#dc2626', apigateway: '#0ea5e9', sqs: '#ff9900',
-              sns: '#ec4899', dynamodb: '#4f46e5', msk: '#7c3aed', kinesis: '#0891b2',
-              vpce: '#64748b', route53: '#16a34a',
-              ebs: '#6366f1', s3: '#16a34a', efs: '#0891b2', eventbridge: '#f59e0b',
-              stepfunctions: '#7c3aed', waf: '#dc2626', ecr: '#0ea5e9',
-              rdsproxy: '#3b82f6', redshift: '#4f46e5', opensearch: '#0891b2',
-              vpcGroup: 'transparent',
-            };
-            return map[n.type] ?? '#4b5563';
-          }}
-          maskColor="rgba(0,0,0,0.6)"
-        />
-        <Controls />
+        {!isExporting && <Controls />}
       </ReactFlow>
 
       <EdgeLegend edges={filteredEdges} />
+      <BrandWidget />
 
       {selected && (
         <NodeDetail node={selected} region={data.region} onClose={() => setSelected(null)} />

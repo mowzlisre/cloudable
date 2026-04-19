@@ -90,6 +90,7 @@ export default function Hygiene() {
     queryFn: () => fetch(`${BASE}/api/hygiene?region=${region}`)
       .then(r => r.ok ? r.json() : r.json().then(e => Promise.reject(new Error(e.error)))),
     staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const { data: regionScores } = useQuery({
@@ -106,7 +107,9 @@ export default function Hygiene() {
         .sort((a, b) => b.score - a.score)
         .slice(0, 5);
     },
-    staleTime: 30 * 60 * 1000,
+    staleTime: 2 * 60 * 60 * 1000,
+    enabled: !!data,
+    refetchOnWindowFocus: false,
   });
 
   const categoriesBySeverity = SEVERITY_ORDER.map(sev => ({
@@ -120,7 +123,11 @@ export default function Hygiene() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-xl font-semibold text-white">Cloud Hygiene</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Detection engine for idle, orphaned, and insecure resources</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <p className="text-sm text-gray-500">Detection engine for idle, orphaned, and insecure resources</p>
+            <span className="text-gray-700">·</span>
+            <RegionPicker value={region} onChange={setRegion} />
+          </div>
         </div>
         <button
           onClick={() => refetch()}

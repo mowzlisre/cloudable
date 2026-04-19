@@ -1,5 +1,4 @@
 const path = require('path');
-const { execSync } = require('child_process');
 
 module.exports = {
   packagerConfig: {
@@ -21,13 +20,6 @@ module.exports = {
       return false;
     },
     osxSign: {},        // Attempt signing if CSC_LINK is set; no-op otherwise
-  },
-
-  hooks: {
-    prePackage: async () => {
-      console.log('Building frontend...');
-      execSync('npm run build:frontend', { stdio: 'inherit', cwd: __dirname });
-    },
   },
 
   makers: [

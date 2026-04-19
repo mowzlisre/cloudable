@@ -11,11 +11,11 @@
     "dev": "concurrently -n FRONTEND,ELECTRON -c cyan,yellow \"npm run dev:frontend\" \"wait-on http://localhost:5173 && electron .\"",
     "dev:frontend": "cd frontend && npm run dev",
     "build:frontend": "cd frontend && npm run build",
-    "make": "electron-forge make",
-    "make:mac": "electron-forge make --platform darwin",
-    "make:win": "electron-forge make --platform win32",
-    "make:linux": "electron-forge make --platform linux",
-    "package": "electron-forge package"
+    "make": "npm run build:frontend && electron-forge make",
+    "make:mac": "npm run build:frontend && electron-forge make --platform darwin",
+    "make:win": "npm run build:frontend && electron-forge make --platform win32",
+    "make:linux": "npm run build:frontend && electron-forge make --platform linux",
+    "package": "npm run build:frontend && electron-forge package"
   },
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.1032.0",

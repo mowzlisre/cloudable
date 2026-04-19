@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRegion } from '../context/RegionContext';
-import { Map, RefreshCw, AlertCircle, Info, ChevronDown, Download } from 'lucide-react';
+import { RefreshCw, AlertCircle, Info, ChevronDown, Download, Bug } from 'lucide-react';
+import { toPng, toJpeg, toSvg } from 'html-to-image';
+import jsPDF from 'jspdf';
 import Spinner from '../components/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
 import MapCanvas from '../components/mapper/MapCanvas';
@@ -70,6 +72,7 @@ function RegionPicker({ value, onChange }) {
 export default function Mapper() {
   const { region, setRegion } = useRegion();
   const qc = useQueryClient();
+  const canvasRef = useRef(null);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ['mapper', region],
@@ -83,32 +86,53 @@ export default function Mapper() {
   }
 
   const hasData = data && data.nodes?.length > 0;
+  const [exportOpen, setExportOpen] = useState(false);
 
-  function handleExport() {
-    if (!data) return;
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = `cloudable-topology-${region}-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click(); URL.revokeObjectURL(url);
+  function dlDataUrl(dataUrl, name) {
+    const a = document.createElement('a');
+    a.href = dataUrl; a.download = name; a.click();
+  }
+
+  async function handleExport(format) {
+    const filename = `cloudable-${region}-${new Date().toISOString().slice(0, 10)}`;
+    if (format === 'json') {
+      if (!data) return;
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      dlDataUrl(url, `${filename}.json`);
+      URL.revokeObjectURL(url);
+      return;
+    }
+    const el = canvasRef.current;
+    if (!el) return;
+    const opts = { backgroundColor: '#080808', skipFonts: true };
+    if (format === 'png') {
+      dlDataUrl(await toPng(el, opts), `${filename}.png`);
+    } else if (format === 'jpeg') {
+      dlDataUrl(await toJpeg(el, { ...opts, quality: 0.95 }), `${filename}.jpg`);
+    } else if (format === 'svg') {
+      dlDataUrl(await toSvg(el, opts), `${filename}.svg`);
+    } else if (format === 'pdf') {
+      const url = await toPng(el, opts);
+      const img = new Image(); img.src = url;
+      await new Promise(r => { img.onload = r; });
+      const pdf = new jsPDF({
+        orientation: img.width > img.height ? 'l' : 'p',
+        unit: 'px',
+        format: [img.width, img.height],
+      });
+      pdf.addImage(url, 'PNG', 0, 0, img.width, img.height);
+      pdf.save(`${filename}.pdf`);
+    }
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
-      <div className="px-8 py-5 flex items-center justify-between shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-        <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-red-950/60 rounded-lg">
-            <Map size={15} className="text-red-400" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold text-white leading-none">Resource Mapper</h1>
-            <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-xs text-gray-500">Visual topology of your AWS infrastructure</p>
-              <span className="text-gray-700">·</span>
-              <RegionPicker value={region} onChange={handleRegionChange} />
-            </div>
-          </div>
+      <div className="px-8 py-8 flex items-center justify-between shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
+        <div>
+          <h1 className="text-xl font-semibold text-white">Resource Mapper</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Visual topology of your AWS infrastructure</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -117,11 +141,37 @@ export default function Mapper() {
               {data.nodes.length} resources · {data.edges.length} connections
             </span>
           )}
+          <button
+            onClick={() => window.electronAPI?.openExternal('https://github.com/mowzlisre/cloudable/issues/new')}
+            className="flex items-center gap-2 text-xs text-gray-500 hover:text-white border border-[#1e1e1e] hover:border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-all"
+          >
+            <Bug size={12} /> Raise Issue
+          </button>
           {hasData && (
-            <button onClick={handleExport}
-              className="flex items-center gap-2 text-xs text-gray-500 hover:text-white border border-[#1e1e1e] hover:border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-all">
-              <Download size={12} /> Export JSON
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setExportOpen(o => !o)}
+                className="flex items-center gap-2 text-xs text-gray-500 hover:text-white border border-[#1e1e1e] hover:border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-all"
+              >
+                <Download size={12} /> Export <ChevronDown size={10} className={`transition-transform ${exportOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {exportOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setExportOpen(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-20 card py-1" style={{ minWidth: 120, background: '#111111' }}>
+                    {['JSON', 'PNG', 'JPEG', 'SVG', 'PDF'].map(fmt => (
+                      <button
+                        key={fmt}
+                        onClick={() => { handleExport(fmt.toLowerCase()); setExportOpen(false); }}
+                        className="w-full text-left px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-[#1a1a1a] transition-colors"
+                      >
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           )}
           <button
             onClick={() => refetch()}
@@ -165,7 +215,7 @@ export default function Mapper() {
             <p className="text-xs text-gray-600">Try a different region using the picker above.</p>
           </div>
         ) : (
-          <MapCanvas data={data} />
+          <MapCanvas data={data} ref={canvasRef} />
         )}
       </div>
     </div>

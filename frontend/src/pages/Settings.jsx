@@ -17,20 +17,61 @@ const IAM_POLICY = JSON.stringify({
   Version: '2012-10-17',
   Statement: [
     { Sid: 'CloudableReadOnly', Effect: 'Allow', Action: [
+      // Cost
       'ce:GetCostAndUsage', 'ce:GetCostForecast', 'ce:GetDimensionValues',
+      // EC2 / Networking
       'ec2:DescribeInstances', 'ec2:DescribeVpcs', 'ec2:DescribeSubnets',
       'ec2:DescribeSecurityGroups', 'ec2:DescribeInternetGateways',
       'ec2:DescribeNatGateways', 'ec2:DescribeAddresses', 'ec2:DescribeRouteTables',
-      'ec2:DescribeVolumes', 'rds:DescribeDBInstances', 'rds:DescribeDBClusters',
-      'rds:ListTagsForResource', 's3:ListAllMyBuckets', 's3:GetBucketLocation',
-      's3:GetBucketTagging', 's3:GetBucketVersioning', 's3:GetLifecycleConfiguration',
+      'ec2:DescribeVolumes', 'ec2:DescribeVpcEndpoints', 'ec2:DescribeNetworkInterfaces',
+      // RDS / Aurora / Proxy
+      'rds:DescribeDBInstances', 'rds:DescribeDBClusters', 'rds:ListTagsForResource',
+      'rds:DescribeDBProxies', 'rds:DescribeDBProxyTargets',
+      // S3
+      's3:ListAllMyBuckets', 's3:GetBucketLocation', 's3:GetBucketTagging',
+      's3:GetBucketVersioning', 's3:GetLifecycleConfiguration',
       's3:GetBucketPublicAccessBlock', 's3:ListMultipartUploadParts',
-      's3:ListBucketMultipartUploads', 'elasticloadbalancing:DescribeLoadBalancers',
+      's3:ListBucketMultipartUploads', 's3:GetBucketNotificationConfiguration',
+      // Load Balancing
+      'elasticloadbalancing:DescribeLoadBalancers',
       'elasticloadbalancing:DescribeTargetGroups', 'elasticloadbalancing:DescribeTargetHealth',
+      // CloudWatch
       'cloudwatch:GetMetricData', 'cloudwatch:GetMetricStatistics',
-      'lambda:ListFunctions', 'ecs:ListClusters', 'ecs:ListServices', 'ecs:DescribeServices',
-      'ecs:DescribeClusters', 'cloudfront:ListDistributions', 'route53:ListHostedZones',
-      'route53:ListResourceRecordSets', 'iam:GetUser', 'sts:GetCallerIdentity',
+      // Lambda
+      'lambda:ListFunctions', 'lambda:ListEventSourceMappings',
+      // ECS
+      'ecs:ListClusters', 'ecs:ListServices', 'ecs:DescribeServices',
+      'ecs:DescribeClusters', 'ecs:DescribeTaskDefinition',
+      // CloudFront / Route53
+      'cloudfront:ListDistributions',
+      'route53:ListHostedZones', 'route53:ListResourceRecordSets',
+      // ElastiCache
+      'elasticache:DescribeReplicationGroups', 'elasticache:DescribeCacheClusters',
+      // API Gateway
+      'apigateway:GET',
+      // SQS / SNS / DynamoDB
+      'sqs:ListQueues',
+      'sns:ListTopics', 'sns:ListSubscriptions',
+      'dynamodb:ListTables',
+      // MSK / Kinesis
+      'kafka:ListClustersV2',
+      'kinesis:ListStreams',
+      // EFS
+      'elasticfilesystem:DescribeFileSystems', 'elasticfilesystem:DescribeMountTargets',
+      // EventBridge
+      'events:ListRules', 'events:ListTargetsByRule',
+      // Step Functions
+      'states:ListStateMachines', 'states:DescribeStateMachine',
+      // WAF
+      'wafv2:ListWebACLs', 'wafv2:GetWebACL', 'wafv2:ListResourcesForWebACL',
+      // ECR
+      'ecr:DescribeRepositories',
+      // Redshift
+      'redshift:DescribeClusters',
+      // OpenSearch
+      'es:ListDomainNames', 'es:DescribeElasticsearchDomains',
+      // IAM / STS / Org
+      'iam:GetUser', 'sts:GetCallerIdentity',
       'organizations:ListAccounts', 'organizations:DescribeOrganization',
     ], Resource: '*' },
   ],

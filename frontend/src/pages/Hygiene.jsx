@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRegion } from '../context/RegionContext';
 import { useQuery } from '@tanstack/react-query';
-import { HeartPulse, RefreshCw, ChevronDown, MapPin } from 'lucide-react';
+import { RefreshCw, ChevronDown, MapPin } from 'lucide-react';
 import Spinner from '../components/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
 import HygieneScore from '../components/hygiene/HygieneScore';
@@ -9,6 +9,8 @@ import CleanupSuggestions from '../components/hygiene/CleanupSuggestions';
 import HygieneCategory from '../components/hygiene/HygieneCategory';
 
 const BASE = import.meta.env.VITE_API_URL || '';
+
+const TOP_SCAN_REGIONS = ['us-east-1', 'us-east-2', 'us-west-2', 'eu-west-1', 'ap-southeast-1'];
 
 const REGIONS = [
   { group: 'US',           items: ['us-east-1','us-east-2','us-west-1','us-west-2'] },
@@ -90,6 +92,23 @@ export default function Hygiene() {
     staleTime: 10 * 60 * 1000,
   });
 
+  const { data: regionScores } = useQuery({
+    queryKey: ['hygiene-region-scores'],
+    queryFn: async () => {
+      const results = await Promise.allSettled(
+        TOP_SCAN_REGIONS.map(r =>
+          fetch(`${BASE}/api/hygiene?region=${r}`).then(res => res.ok ? res.json() : null)
+        )
+      );
+      return results
+        .map((r, i) => ({ region: TOP_SCAN_REGIONS[i], score: r.status === 'fulfilled' && r.value?.score?.overall != null ? r.value.score.overall : null }))
+        .filter(r => r.score != null)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+    },
+    staleTime: 30 * 60 * 1000,
+  });
+
   const categoriesBySeverity = SEVERITY_ORDER.map(sev => ({
     sev,
     cats: (data?.categories ?? []).filter(c => c.severity === sev),
@@ -98,19 +117,10 @@ export default function Hygiene() {
   return (
     <div className="p-8 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-red-950/60 rounded-lg">
-            <HeartPulse size={15} className="text-red-400" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold text-white">Cloud Hygiene</h1>
-            <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-xs text-gray-500">Detection engine for idle, orphaned, and insecure resources</p>
-              <span className="text-gray-700">·</span>
-              <RegionPicker value={region} onChange={setRegion} />
-            </div>
-          </div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-xl font-semibold text-white">Cloud Hygiene</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Detection engine for idle, orphaned, and insecure resources</p>
         </div>
         <button
           onClick={() => refetch()}
@@ -133,7 +143,7 @@ export default function Hygiene() {
       ) : data ? (
         <>
           {/* Score + summary */}
-          <HygieneScore score={data.score} summary={data.summary} />
+          <HygieneScore score={data.score} summary={data.summary} regionScores={regionScores} />
 
           {/* Cleanup suggestions */}
           <CleanupSuggestions suggestions={data.suggestions} />

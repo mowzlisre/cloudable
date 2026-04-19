@@ -88,11 +88,11 @@ export default function Aggregator() {
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => navigate('/settings')}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs border border-[#1e1e1e] hover:border-red-800 text-gray-400 hover:text-red-400 rounded-lg transition-all">
+            className="flex items-center gap-2 text-xs text-gray-500 hover:text-white border border-[#1e1e1e] hover:border-[#2a2a2a] disabled:opacity-50 px-3 py-1.5 rounded-lg transition-all">
             <Plus size={12} /> Add account
           </button>
           <button onClick={() => refetch()} disabled={isFetching}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs border border-[#1e1e1e] hover:border-[#2a2a2a] text-gray-400 hover:text-white rounded-lg transition-all">
+            className="flex items-center gap-2 text-xs text-gray-500 hover:text-white border border-[#1e1e1e] hover:border-[#2a2a2a] disabled:opacity-50 px-3 py-1.5 rounded-lg transition-all">
             <RefreshCw size={12} className={isFetching ? 'animate-spin' : ''} />
             {isFetching ? 'Loading…' : 'Refresh'}
           </button>

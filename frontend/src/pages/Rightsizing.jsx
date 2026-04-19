@@ -287,7 +287,7 @@ export default function Rightsizing() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs border border-[#1e1e1e] hover:border-[#2a2a2a] text-gray-400 hover:text-white rounded-lg transition-all"
+          className="flex items-center gap-2 text-xs text-gray-500 hover:text-white border border-[#1e1e1e] hover:border-[#2a2a2a] disabled:opacity-50 px-3 py-1.5 rounded-lg transition-all"
         >
           <RefreshCw size={12} className={isFetching ? 'animate-spin' : ''} />
           {isFetching ? 'Analyzing…' : 'Re-analyze'}

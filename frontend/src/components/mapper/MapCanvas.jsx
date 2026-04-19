@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, forwardRef } from 'react';
 import ReactFlow, {
   Background, Controls, MiniMap,
   useNodesState, useEdgesState,
@@ -34,8 +34,12 @@ function VpcGroupNode({ data }) {
 
 const nodeTypes = {
   internet: MapNode, igw: MapNode, vpc: MapNode, subnet: MapNode,
-  ec2: MapNode, rds: MapNode, eip: MapNode, nat: MapNode, alb: MapNode,
-  lambda: MapNode, ecs: MapNode, cloudfront: MapNode,
+  ec2: MapNode, rds: MapNode, aurora: MapNode, eip: MapNode, nat: MapNode,
+  alb: MapNode, lambda: MapNode, ecs: MapNode, cloudfront: MapNode,
+  elasticache: MapNode, apigateway: MapNode, sqs: MapNode, sns: MapNode,
+  dynamodb: MapNode, msk: MapNode, kinesis: MapNode, vpce: MapNode, route53: MapNode,
+  ebs: MapNode, s3: MapNode, efs: MapNode, eventbridge: MapNode, stepfunctions: MapNode,
+  waf: MapNode, ecr: MapNode, rdsproxy: MapNode, redshift: MapNode, opensearch: MapNode,
   vpcGroup: VpcGroupNode,
 };
 
@@ -87,8 +91,12 @@ function EdgeLegend({ edges }) {
 
 // ── Filter bar ───────────────────────────────────────────────────────────────
 const TYPE_LABELS = {
-  ec2: 'EC2', rds: 'RDS', alb: 'ALB', nat: 'NAT', igw: 'IGW',
+  ec2: 'EC2', rds: 'RDS', aurora: 'Aurora', alb: 'ALB', nat: 'NAT', igw: 'IGW',
   eip: 'EIP', lambda: 'Lambda', ecs: 'ECS', cloudfront: 'CloudFront',
+  elasticache: 'ElastiCache', apigateway: 'API GW', sqs: 'SQS', sns: 'SNS',
+  dynamodb: 'DynamoDB', msk: 'MSK', kinesis: 'Kinesis', vpce: 'VPC EP', route53: 'R53',
+  ebs: 'EBS', s3: 'S3', efs: 'EFS', eventbridge: 'EventBridge', stepfunctions: 'Step Fn',
+  waf: 'WAF', ecr: 'ECR', rdsproxy: 'RDS Proxy', redshift: 'Redshift', opensearch: 'OpenSearch',
 };
 
 function FilterBar({ presentTypes, hiddenTypes, setHiddenTypes, issuesOnly, setIssuesOnly, issueCount }) {
@@ -153,8 +161,16 @@ function buildEdges(rawEdges) {
   });
 }
 
+const CONTROLS_CSS = `
+.react-flow__controls { background: #111111 !important; border: 1px solid #1e1e1e !important; border-radius: 8px !important; box-shadow: none !important; }
+.react-flow__controls button { background: transparent !important; border: none !important; border-bottom: 1px solid #1e1e1e !important; fill: #ef4444 !important; color: #ef4444 !important; }
+.react-flow__controls button:last-child { border-bottom: none !important; }
+.react-flow__controls button:hover { background: rgba(239,68,68,0.08) !important; }
+.react-flow__controls button svg { fill: #ef4444 !important; }
+`;
+
 // ── Main canvas ──────────────────────────────────────────────────────────────
-export default function MapCanvas({ data }) {
+const MapCanvas = forwardRef(function MapCanvas({ data }, ref) {
   const initialNodes = useMemo(() => buildTieredLayout(data.nodes), [data]);
   const initialEdges = useMemo(() => buildEdges(data.edges), [data]);
 
@@ -199,7 +215,8 @@ export default function MapCanvas({ data }) {
   }, [edges, nodes, hiddenTypes, issuesOnly]);
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div ref={ref} style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <style>{CONTROLS_CSS}</style>
       <FilterBar
         presentTypes={presentTypes}
         hiddenTypes={hiddenTypes}
@@ -228,12 +245,23 @@ export default function MapCanvas({ data }) {
         <MiniMap
           style={{ background: '#111111', border: '1px solid #1e1e1e' }}
           nodeColor={n => {
-            const map = { ec2: '#f97316', rds: '#3b82f6', igw: '#22c55e', internet: '#06b6d4', eip: '#eab308', nat: '#f97316', alb: '#a855f7', lambda: '#f59e0b', ecs: '#10b981', cloudfront: '#8b5cf6', vpcGroup: 'transparent' };
+            const map = {
+              ec2: '#f97316', rds: '#3b82f6', aurora: '#1d4ed8', igw: '#22c55e',
+              internet: '#06b6d4', eip: '#eab308', nat: '#f97316', alb: '#a855f7',
+              lambda: '#f59e0b', ecs: '#10b981', cloudfront: '#8b5cf6',
+              elasticache: '#dc2626', apigateway: '#0ea5e9', sqs: '#ff9900',
+              sns: '#ec4899', dynamodb: '#4f46e5', msk: '#7c3aed', kinesis: '#0891b2',
+              vpce: '#64748b', route53: '#16a34a',
+              ebs: '#6366f1', s3: '#16a34a', efs: '#0891b2', eventbridge: '#f59e0b',
+              stepfunctions: '#7c3aed', waf: '#dc2626', ecr: '#0ea5e9',
+              rdsproxy: '#3b82f6', redshift: '#4f46e5', opensearch: '#0891b2',
+              vpcGroup: 'transparent',
+            };
             return map[n.type] ?? '#4b5563';
           }}
           maskColor="rgba(0,0,0,0.6)"
         />
-        <Controls style={{ background: '#111111', border: '1px solid #1e1e1e', borderRadius: 8 }} />
+        <Controls />
       </ReactFlow>
 
       <EdgeLegend edges={filteredEdges} />
@@ -243,4 +271,5 @@ export default function MapCanvas({ data }) {
       )}
     </div>
   );
-}
+});
+export default MapCanvas;

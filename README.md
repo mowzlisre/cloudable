@@ -235,6 +235,22 @@ Cloudable only needs **read-only** access. Attach the following policy to your I
 
 ---
 
+## macOS — "damaged and can't be opened"
+
+This happens because the app is ad-hoc signed but not notarized by Apple. macOS quarantines apps downloaded from the internet that aren't notarized.
+
+**Workaround — remove the quarantine attribute:**
+
+```bash
+xattr -cr /Applications/Cloudable.app
+```
+
+Then open it normally. This is safe — it just tells macOS you trust this specific app.
+
+**Why not notarized?** Notarization requires an Apple Developer Program membership ($99/year). If you build from source locally (`npm run make:mac`), the quarantine attribute is never set and the app opens without issue.
+
+---
+
 ## Known Limitations
 
 - **Hardcoded pricing**: EC2 and RDS cost estimates use baked-in US East 1 on-demand Linux pricing. Savings Plans, Reserved Instances, and Spot are not reflected.

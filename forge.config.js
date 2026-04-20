@@ -19,7 +19,11 @@ module.exports = {
       if (/^\/backend\/(\.env|deploy\.sh)/.test(filePath)) return true;
       return false;
     },
-    osxSign: {},        // Attempt signing if CSC_LINK is set; no-op otherwise
+    // Ad-hoc sign so macOS doesn't quarantine the app as "damaged".
+    // Replace identity with a real Developer ID cert for notarized distribution.
+    osxSign: {
+      identity: process.env.CSC_LINK ? undefined : '-',
+    },
   },
 
   makers: [

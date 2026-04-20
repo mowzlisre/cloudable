@@ -40,6 +40,8 @@ jobs:
       - run: npm ci
       - run: npm ci
         working-directory: frontend
+      - name: Build frontend
+        run: npm run build:frontend
       - name: Make
         run: npx electron-forge make --platform darwin --arch arm64
         env:
@@ -75,6 +77,8 @@ jobs:
       - run: npm ci
       - run: npm ci
         working-directory: frontend
+      - name: Build frontend
+        run: npm run build:frontend
       - name: Make
         run: npx electron-forge make --platform darwin --arch x64
         env:
@@ -99,6 +103,8 @@ jobs:
       - run: npm ci
       - run: npm ci
         working-directory: frontend
+      - name: Build frontend
+        run: npm run build:frontend
       - name: Make
         run: npx electron-forge make --platform win32 --arch x64
       - uses: actions/upload-artifact@v4
@@ -122,6 +128,8 @@ jobs:
       - run: npm ci
       - run: npm ci
         working-directory: frontend
+      - name: Build frontend
+        run: npm run build:frontend
       - name: Make
         run: npx electron-forge make --platform linux --arch x64
       - uses: actions/upload-artifact@v4

@@ -5,6 +5,8 @@ const TYPE_LABELS = {
   rds: 'RDS Instance', eip: 'Elastic IP', nat: 'NAT Gateway',
   alb: 'Load Balancer', lambda: 'Lambda Function', ecs: 'ECS Service',
   cloudfront: 'CloudFront Distribution',
+  namespace: 'Namespace', deployment: 'Deployment', statefulset: 'StatefulSet',
+  daemonset: 'DaemonSet', replicaset: 'ReplicaSet', service: 'Service', pod: 'Pod',
 };
 
 const ISSUE_COLOR = { waste: '#ef4444', idle: '#f59e0b', security: '#a855f7' };

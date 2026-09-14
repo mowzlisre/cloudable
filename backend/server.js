@@ -16,6 +16,7 @@ const rdsRouter           = require('./routes/rds');
 const s3Router            = require('./routes/s3');
 const organizationsRouter = require('./routes/organizations');
 const othersRouter        = require('./routes/others');
+const kubernetesRouter    = require('./routes/kubernetes');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/rds',          rdsRouter);
 app.use('/api/s3',           s3Router);
 app.use('/api/organizations', organizationsRouter);
 app.use('/api/others',       othersRouter);
+app.use('/api/kubernetes',   kubernetesRouter);
 
 app.use((err, req, res, _next) => {
   console.error(err);

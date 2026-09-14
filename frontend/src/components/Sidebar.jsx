@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Building2, Server, Database, HardDrive, Box,
   DollarSign, FileText, Map, HeartPulse, TrendingDown, Globe,
   Settings, CloudLightning, ChevronDown, ExternalLink, HelpCircle,
-  Layers, ChevronUp, Scale,
+  Layers, ChevronUp, Scale, Boxes,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
@@ -31,6 +31,7 @@ const NAV = [
     ],
   },
   { to: '/mapper',      icon: Map,         label: 'Resource Map' },
+  { to: '/kubernetes',  icon: Boxes,       label: 'Kubernetes' },
   { to: '/hygiene',     icon: HeartPulse,  label: 'Cloud Hygiene' },
   { to: '/rightsizing', icon: TrendingDown, label: 'Rightsizing' },
   { to: '/aggregator',  icon: Globe,        label: 'Multi-Account' },

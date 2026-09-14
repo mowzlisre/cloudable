@@ -10,6 +10,7 @@ import HiddenCharges from './pages/HiddenCharges';
 import Invoice from './pages/Invoice';
 import Settings from './pages/Settings';
 import Mapper from './pages/Mapper';
+import Kubernetes from './pages/Kubernetes';
 import Hygiene from './pages/Hygiene';
 import Rightsizing from './pages/Rightsizing';
 import Aggregator from './pages/Aggregator';
@@ -46,6 +47,7 @@ export default function App() {
               <Route path="hidden" element={<HiddenCharges />} />
               <Route path="invoice" element={<Invoice />} />
               <Route path="mapper" element={<Mapper />} />
+              <Route path="kubernetes" element={<Kubernetes />} />
               <Route path="hygiene" element={<Hygiene />} />
               <Route path="rightsizing"    element={<Rightsizing />} />
               <Route path="aggregator"    element={<Aggregator />} />
